@@ -16,7 +16,7 @@ defmodule HolidayEx.MixProject do
   defp package do
     [
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/yourname/holiday_ex"},
+      links: %{"GitHub" => "https://github.com/OmniThinker/holiday_ex"},
       files: ["lib", "priv", "mix.exs", "README.md", "LICENSE"]
     ]
   end
