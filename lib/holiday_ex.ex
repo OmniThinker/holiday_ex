@@ -3,7 +3,7 @@ defmodule HolidayEx do
   HolidayEx is a library for checking whether a date falls within a publicly observed holiday.
 
   This module is meant as a replacement for the Holiday library. It builds on that library, but instead of
-  messing around with genservers and applications we generate the code using macros and data files.
+  messing around with genservers and applications we generate a lookup map using yml files.
   Most of the credit for the actual logic goes to CoderDenis.
 
   We use  yml files for the holidays, so any discrepancy found in the library can be solved with a pull request 
