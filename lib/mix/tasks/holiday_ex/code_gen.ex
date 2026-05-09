@@ -13,7 +13,31 @@ defmodule Mix.Tasks.HolidayEx.CodeGen do
                end)
 
   def run(_) do
-    IO.puts("HELO")
+    output_folder = "./priv/locale_modules"
+    output_path = Path.absname(output_folder)
+    
+    for locale <- @locales do
+      filename = output_path
+      module_ast(locale)
+      |> 
+    end
+  end
+
+  @spec module_ast(locale :: atom()) :: Macro.t()
+  def module_ast(locale) do
+    date_func = dates(locale) |> date_ast
+    easter_func = easter_offsets(locale) |> easter_ast
+
+    locale_name = locale |> Atom.to_string() |> String.upcase()
+    module_name = Module.concat(HolidayEx, locale_name)
+
+    quote do
+      defmodule unquote(module_name) do
+        @spec holiday(date :: Date.t()) :: binary()
+        unquote_splicing(date_func)
+        unquote(easter_func)
+      end
+    end
   end
 
   def locales(), do: @locales
@@ -55,8 +79,29 @@ defmodule Mix.Tasks.HolidayEx.CodeGen do
   end
 
   @spec easter_ast(easter_offset_tuples()) :: Macro.t()
-  def easter_ast do
+  def easter_ast(offset_tuples) do
+    offset_conditions =
+      Enum.map(offset_tuples, fn {name, offset} ->
+        quote do
+          Date.add(easter_date, unquote(offset)) == date -> unquote(name)
+        end
+      end)
+
+    default_condition =
+      quote do
+        true -> nil
+      end
+
+    conditions = offset_conditions ++ [default_condition]
+
     quote do
+      def holiday(%Date{year: year} = date) do
+        easter_date = HolidayEx.Utils.easter(year)
+
+        cond do
+          (unquote_splicing(conditions))
+        end
+      end
     end
   end
 
