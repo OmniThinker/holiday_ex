@@ -1,4 +1,5 @@
 defmodule HolidayEx.Extract do
+  @moduledoc false
   @external_resource Path.join(:code.priv_dir(:holiday_ex), "definitions")
 
   def extract_locales() do

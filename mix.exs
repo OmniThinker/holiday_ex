@@ -9,9 +9,13 @@ defmodule HolidayEx.MixProject do
       description: "A library for checking publicly observed holidays",
       package: package(),
       deps: deps(),
-      docs: docs()
+      docs: docs(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
+
+  defp elixirc_paths(:dev), do: ["lib", "lib/mix/tasks"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp package do
     [
@@ -30,7 +34,7 @@ defmodule HolidayEx.MixProject do
 
   defp deps do
     [
-      {:yaml_elixir, "~> 2.12"},
+      {:yaml_elixir, "~> 2.12", only: :dev, runtime: false},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false}
     ]
   end
