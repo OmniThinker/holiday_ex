@@ -21,4 +21,11 @@ defmodule HolidayEx.Utils do
 
     Date.new!(year, month, day)
   end
+
+  def weekday_to_date(year, month, week, day_in_week) do
+    %Date{year: year, month: month, day: 1}
+    |> Date.beginning_of_week()
+    |> Date.add(7 * week)
+    |> Date.add(day_in_week - 1)
+  end
 end

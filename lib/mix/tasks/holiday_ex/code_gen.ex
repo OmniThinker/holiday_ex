@@ -1,6 +1,5 @@
 defmodule Mix.Tasks.HolidayEx.CodeGen do
   use Mix.Task
-  alias HolidayEx.Extract
 
   @locales HolidayEx.Extract.extract_locales()
   @locale_files HolidayEx.Extract.extract_locale_files()
@@ -11,31 +10,72 @@ defmodule Mix.Tasks.HolidayEx.CodeGen do
                  locale = HolidayEx.Extract.extract_locale(locale_file) |> String.to_atom()
                  Map.put(acc, locale, months)
                end)
+  @method_map Enum.reduce(@locale_files, %{}, fn locale_file, acc ->
+                file_path = Path.join([:code.priv_dir(:holiday_ex), "definitions", locale_file])
+                holidays = YamlElixir.read_from_file!(file_path)
+                methods = Map.get(holidays, "methods")
+                locale = HolidayEx.Extract.extract_locale(locale_file) |> String.to_atom()
+                Map.put(acc, locale, methods)
+              end)
 
   def run(_) do
     output_folder = "./priv/locale_modules"
     output_path = Path.absname(output_folder)
-    
+
     for locale <- @locales do
-      filename = output_path
-      module_ast(locale)
-      |> 
+      filename = Path.join(output_path, Atom.to_string(locale) <> ".ex")
+
+      macro_str =
+        module_ast(locale)
+        |> Macro.to_string()
+
+      methods = (Map.get(method_map(), locale) || %{}) |> Map.values() |> Enum.join()
+
+      full_file =
+        if methods do
+          macro_str <> methods
+        else
+          macro_str
+        end
+
+      File.write!(filename, full_file)
     end
   end
 
   @spec module_ast(locale :: atom()) :: Macro.t()
   def module_ast(locale) do
     date_func = dates(locale) |> date_ast
-    easter_func = easter_offsets(locale) |> easter_ast
+    easter_conds = easter_offsets(locale) |> easter_conditions()
+    week_conds = week_dates(locale) |> week_conditions
+    special_conds = special_dates(locale) |> special_date_conditions
+
+    default_condition =
+      quote do
+        true -> nil
+      end
+
+    conditions =
+      List.flatten([
+        easter_conds,
+        week_conds,
+        special_conds,
+        [default_condition]
+      ])
 
     locale_name = locale |> Atom.to_string() |> String.upcase()
     module_name = Module.concat(HolidayEx, locale_name)
+
+    cond_ast = {:cond, [], [[do: conditions]]}
 
     quote do
       defmodule unquote(module_name) do
         @spec holiday(date :: Date.t()) :: binary()
         unquote_splicing(date_func)
-        unquote(easter_func)
+
+        def holiday(%Date{year: year} = date) do
+          easter_date = HolidayEx.Utils.easter(year)
+          unquote(cond_ast)
+        end
       end
     end
   end
@@ -43,6 +83,7 @@ defmodule Mix.Tasks.HolidayEx.CodeGen do
   def locales(), do: @locales
   def locale_files(), do: @locale_files
   def holiday_map(), do: @holiday_map
+  def method_map(), do: @method_map
 
   @type date_tuples :: [{month :: integer(), day :: integer(), name :: binary()}]
 
@@ -53,6 +94,7 @@ defmodule Mix.Tasks.HolidayEx.CodeGen do
     |> Enum.flat_map(fn {month, days} ->
       Enum.map(days, fn day -> {month, day} end)
     end)
+    |> Enum.filter(fn {_, mp} -> Map.has_key?(mp, "mday") end)
     |> Enum.map(fn {month, %{"mday" => day, "name" => name}} ->
       {month, day, name}
     end)
@@ -71,38 +113,77 @@ defmodule Mix.Tasks.HolidayEx.CodeGen do
   @spec easter_offsets(atom()) :: easter_offset_tuples()
   def easter_offsets(locale) do
     Map.get(holiday_map(), locale)
-    |> Map.get(0)
+    |> Map.get(0, [])
+    |> Enum.filter(fn %{"function" => func} ->
+      String.starts_with?(func, "easter")
+    end)
     |> Enum.map(fn %{"function" => func, "name" => name} ->
       offset = read_offset(func)
       {name, offset}
     end)
   end
 
-  @spec easter_ast(easter_offset_tuples()) :: Macro.t()
-  def easter_ast(offset_tuples) do
-    offset_conditions =
-      Enum.map(offset_tuples, fn {name, offset} ->
-        quote do
-          Date.add(easter_date, unquote(offset)) == date -> unquote(name)
-        end
-      end)
-
-    default_condition =
+  @spec easter_conditions(easter_offset_tuples()) :: Macro.t()
+  def easter_conditions(offset_tuples) do
+    Enum.map(offset_tuples, fn {name, offset} ->
       quote do
-        true -> nil
+        Date.add(easter_date, unquote(offset)) == date -> unquote(name)
       end
+    end)
+  end
 
-    conditions = offset_conditions ++ [default_condition]
+  @type week_date :: {month :: integer(), week :: integer(), day :: integer(), name :: binary()}
+  @spec week_dates(locale :: atom()) :: [week_date()]
+  def week_dates(locale) do
+    Map.get(holiday_map(), locale)
+    |> Enum.filter(fn {month, _} -> month > 0 end)
+    |> Enum.flat_map(fn {month, days} ->
+      Enum.map(days, fn day -> {month, day} end)
+    end)
+    |> Enum.filter(fn {_, mp} -> Map.has_key?(mp, "wday") end)
+    |> Enum.map(fn {month, %{"wday" => day, "week" => week, "name" => name}} ->
+      {month, week, day, name}
+    end)
+  end
 
-    quote do
-      def holiday(%Date{year: year} = date) do
-        easter_date = HolidayEx.Utils.easter(year)
-
-        cond do
-          (unquote_splicing(conditions))
-        end
+  def week_conditions(wds) do
+    Enum.map(wds, fn {month, week, day, name} ->
+      quote do
+        date ==
+            HolidayEx.Utils.weekday_to_date(
+              year,
+              unquote(month),
+              unquote(week),
+              unquote(day)
+            ) ->
+          unquote(name)
       end
-    end
+    end)
+  end
+
+  @type special_date :: {month :: integer(), function :: binary(), name :: binary()}
+  @spec special_dates(locale :: atom()) :: term()
+  def special_dates(locale) do
+    Map.get(holiday_map(), locale)
+    |> Enum.filter(fn {month, _} -> month > 0 end)
+    |> Enum.flat_map(fn {month, days} ->
+      Enum.map(days, fn day -> {month, day} end)
+    end)
+    |> Enum.reject(fn {_, mp} -> Map.has_key?(mp, "mday") || Map.has_key?(mp, "wday") end)
+    |> Enum.map(fn {month, %{"function" => function, "name" => name}} ->
+      {month, function, name}
+    end)
+  end
+
+  def special_date_conditions(spec_dates) do
+    spec_dates
+    |> Enum.map(fn {month, function, name} ->
+      func = Code.string_to_quoted!(function)
+
+      quote do
+        unquote(func) -> unquote(name)
+      end
+    end)
   end
 
   @spec read_offset(binary()) :: integer()

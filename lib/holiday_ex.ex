@@ -28,4 +28,8 @@ defmodule HolidayEx do
   def holiday?(%Date{}, locale) when is_atom(locale) do
     false
   end
+
+  def __using__ do
+    # Code.eval_string(File.read!('./priv/locale_modules/no.ex'))
+  end
 end
