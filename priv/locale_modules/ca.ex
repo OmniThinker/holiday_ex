@@ -69,18 +69,25 @@ defmodule HolidayEx.CA do
       date == HolidayEx.Utils.weekday_to_date(year, 8, 3, 1) -> "Discovery Day"
       date == HolidayEx.Utils.weekday_to_date(year, 9, 1, 1) -> "Labour Day"
       date == HolidayEx.Utils.weekday_to_date(year, 10, 2, 1) -> "Thanksgiving"
-      ca_victoria_day(year) -> "Victoria Day"
-      ca_victoria_day(year) -> "National Patriotes Day"
+      date == ca_victoria_day(year) -> "Victoria Day"
+      date == ca_victoria_day(year) -> "National Patriotes Day"
       true -> nil
     end
   end
-end# Monday on or before May 24
-def self.ca_victoria_day(year)
-  date = Date.civil(year,5,24)
-  if date.wday > 1
-    date -= (date.wday - 1)
-  elsif date.wday == 0
-    date -= 6
+
+  defp ca_victoria_day(year) do
+    date = %Date{year, 5, 24}
+    weekday = Date.day_of_week(date)
+
+    cond do
+      weekday > 1 ->
+        Date.add(date, -(weekday - 1))
+
+      weekday == 0 ->
+        Date.add(date, -6)
+
+      true ->
+        date
+    end
   end
-  date
 end

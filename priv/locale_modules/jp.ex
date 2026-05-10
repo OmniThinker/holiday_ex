@@ -66,7 +66,8 @@ defmodule HolidayEx.JP do
       true -> nil
     end
   end
-enddef self.jp_citizons_holiday(year)
+end
+def self.jp_citizons_holiday(year)
   year < 2003 and return nil
   ncd = Holidays.jp_national_culture_day(year)
   if ncd.wday == 3

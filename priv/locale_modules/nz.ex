@@ -73,19 +73,4 @@ defmodule HolidayEx.NZ do
       true -> nil
     end
   end
-enddef self.closest_monday(date)
-  if [1, 2, 3, 4].include?(date.wday)
-    date -= (date.wday - 1)
-  elsif 0 == date.wday
-    date += 1
-  else
-    date += 8 - date.wday
-  end
-  date
-end
-def self.next_week(date)
-  date + 7
-end
-def self.previous_friday(date)
-  date - 3
 end

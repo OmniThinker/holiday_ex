@@ -52,13 +52,20 @@ defmodule HolidayEx.PH do
       Date.add(easter_date, -2) == date -> "Good Friday"
       Date.add(easter_date, -1) == date -> "Holy Saturday"
       Date.add(easter_date, 0) == date -> "Easter Sunday"
-      ph_heroes_day(year) -> "National Heroes Day"
+      date == ph_heroes_day(year) -> "National Heroes Day"
       true -> nil
     end
   end
-end# last Monday of August
-def self.ph_heroes_day(year)
-  date = Date.new(year, 8, -1)
-  return date if date.wday == 1
-  date -= date.wday - 1
+
+  # last Monday of August
+  def ph_heroes_day(year) do
+    date = %Date{year: year, month: 8, day: 31}
+    weekday = Date.day_of_week(date)
+
+    if weekday == 1 do
+      date
+    else
+      Date.add(date, -(weekday - 1))
+    end
+  end
 end

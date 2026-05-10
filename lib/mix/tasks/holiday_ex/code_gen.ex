@@ -177,7 +177,7 @@ defmodule Mix.Tasks.HolidayEx.CodeGen do
 
   def special_date_conditions(spec_dates) do
     spec_dates
-    |> Enum.map(fn {month, function, name} ->
+    |> Enum.map(fn {_, function, name} ->
       func = Code.string_to_quoted!(function)
 
       quote do

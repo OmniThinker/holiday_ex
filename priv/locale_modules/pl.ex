@@ -4,6 +4,10 @@ defmodule HolidayEx.PL do
     "Nowy Rok"
   end
 
+  def holiday(%Date{month: 1, day: 6}) do
+    "Objawienie Pańskie (święto Trzech Króli)"
+  end
+
   def holiday(%Date{month: 1, day: 21}) do
     "Dzień Babci"
   end
@@ -145,21 +149,8 @@ defmodule HolidayEx.PL do
       Date.add(easter_date, 60) == date ->
         "Uroczystość Najświętszego Ciała i Krwi Pańskiej (Boże Ciało)"
 
-      pl_trzech_kroli(year) ->
-        "Objawienie Pańskie (święto Trzech Króli)"
-
-      pl_trzech_kroli_informal(year) ->
-        "Objawienie Pańskie (święto Trzech Króli)"
-
       true ->
         nil
     end
   end
-end# Poland: January 6 is holiday since 2011
-def self.pl_trzech_kroli(year)
-  year >= 2011 ? 6 : nil
-end
-# Poland: January 6 wasn't holiday before 2011
-def self.pl_trzech_kroli_informal(year)
-  year < 2011 ? 6 : nil
 end

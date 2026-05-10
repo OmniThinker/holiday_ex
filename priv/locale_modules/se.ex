@@ -42,20 +42,23 @@ defmodule HolidayEx.SE do
       Date.add(easter_date, 1) == date -> "Annandag påsk"
       Date.add(easter_date, 39) == date -> "Kristi himmelsfärdsdag"
       Date.add(easter_date, 49) == date -> "Pingstdagen"
-      se_midsommardagen(year) -> "Midsommardagen"
-      se_midsommardagen(year) - 1 -> "Midsommarafton"
+      date == se_midsommardagen(year) -> "Midsommardagen"
+      date == se_midsommardagen(year) - 1 -> "Midsommarafton"
       true -> nil
     end
   end
-end# Sweden: All Saint's Day (Saturday between Oct 31 and Nov 6)
-def self.se_alla_helgons_dag(year)
-  date = Date.civil(year,10,31)
-  date += (6 - date.wday)
-  date
-end
-# Sweden: Mid-summer (Saturday between June 20–26)
-def self.se_midsommardagen(year)
-  date = Date.civil(year,6,20)
-  date += (6 - date.wday)
-  date
+
+  # Sweden: All Saint's Day (Saturday between Oct 31 and Nov 6)
+  defp se_alla_helgons_dag(year) do
+    date = %Date{year: year, month: 10, day: 31}
+    weekday = Date.day_of_week(date)
+    Date.add(date, 6 - weekday)
+  end
+
+  # Sweden: Mid-summer (Saturday between June 20–26)
+  defp se_midsommardagen(year) do
+    date = %Date{year: year, month: 6, day: 20}
+    weekday = Date.day_of_week(date)
+    Date.add(date, 6 - weekday)
+  end
 end

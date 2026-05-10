@@ -72,13 +72,16 @@ defmodule HolidayEx.IS do
       true -> nil
     end
   end
-end# Iceland: first day of summer (Thursday after 18 April)
-def self.is_sumardagurinn_fyrsti(year)
-  date = Date.civil(year,4,18)
-  if date.wday < 4
-    date += (4 - date.wday)
-  else date
-    date += (11 - date.wday)
+
+  defp is_sumardagurinn_fyrsti(year) do
+    date = %Date{year: year, month: 4, day: 18}
+    weekday = Date.day_of_week(date)
+
+    if weekday < 4 do
+      Date.add(date, 4 - weekday)
+    else
+      date
+      Date.add(date, 11 - weekday)
+    end
   end
-  date
 end

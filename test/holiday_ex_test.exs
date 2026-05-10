@@ -1,4 +1,5 @@
 defmodule HolidayExTest do
+  use HolidayEx, locales: [:no]
   use ExUnit.Case
   doctest HolidayEx
 
@@ -15,6 +16,6 @@ defmodule HolidayExTest do
   end
 
   test "holiday? with non-supported locale" do
-    assert_raise ArgumentError, fn -> HolidayEx.holiday?(~D[2026-01-01], :bla) end
+    assert_raise RuntimeError, fn -> HolidayEx.holiday?(~D[2026-01-01], :bla) end
   end
 end

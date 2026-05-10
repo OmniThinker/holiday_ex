@@ -37,30 +37,35 @@ defmodule HolidayEx.FI do
       Date.add(easter_date, 1) == date -> "2. Pääsiäispäivä"
       Date.add(easter_date, 39) == date -> "Helatorstai"
       Date.add(easter_date, 49) == date -> "Helluntaipäivä"
-      fi_juhannusaatto(year) -> "Juhannusaatto"
-      fi_juhannuspaiva(year) -> "Juhannuspäivä"
+      date == fi_juhannusaatto(year) -> "Juhannusaatto"
+      date == fi_juhannuspaiva(year) -> "Juhannuspäivä"
       true -> nil
     end
   end
-end# Finland: Mid-summer eve (Friday between June 19–25)
-def self.fi_juhannusaatto(year)
-  date = Date.civil(year,6,19)
-  if date.wday > 5 #if 19.6 is saturday
-    date += 6
-  else 
-    date += (5 - date.wday)
+
+  # Finland: Mid-summer eve (Friday between June 19–25)
+  defp fi_juhannusaatto(year) do
+    date = %Date{year: year, month: 6, day: 19}
+    weekday = Date.day_of_week(date)
+    # if 19.6 is saturday
+    if weekday > 5 do
+      Date.add(date, 6)
+    else
+      Date.add(date, 5 - weekday)
+    end
   end
-  date
-end
-# Finland: Mid-summer (Saturday between June 20–26)
-def self.fi_juhannuspaiva(year)
-  date = Date.civil(year,6,20)
-  date += (6 - date.wday)
-  date
-end
-# Finland: All Saint's Day (Saturday between Oct 31 and Nov 6)
-def self.fi_pyhainpaiva(year)
-  date = Date.civil(year,10,31)
-  date += (6 - date.wday)
-  date
+
+  # Finland: Mid-summer (Saturday between June 20–26)
+  defp fi_juhannuspaiva(year) do
+    date = %Date{year: year, month: 6, day: 20}
+    weekday = Date.day_of_week(date)
+    Date.add(date, 6 - weekday)
+  end
+
+  # Finland: All Saint's Day (Saturday between Oct 31 and Nov 6)
+  defp fi_pyhainpaiva(year) do
+    date = %Date{year: year, month: 10, day: 31}
+    weekday = Date.day_of_week(date)
+    Date.add(date, 6 - weekday)
+  end
 end

@@ -32,15 +32,30 @@ defmodule HolidayEx.US do
       date == HolidayEx.Utils.weekday_to_date(year, 9, 1, 1) -> "Labor Day"
       date == HolidayEx.Utils.weekday_to_date(year, 10, 2, 1) -> "Columbus Day"
       date == HolidayEx.Utils.weekday_to_date(year, 11, 4, 4) -> "Thanksgiving"
-      us_inauguration_day(year) -> "Inauguration Day"
-      day_after_thanksgiving(year) -> "Day after Thanksgiving"
+      date == us_inauguration_day(year) -> "Inauguration Day"
+      date == day_after_thanksgiving(year) -> "Day after Thanksgiving"
       true -> nil
     end
   end
-enddef self.day_after_thanksgiving(year)
-  Date.calculate_mday(year, 11, 4, 4) + 1
-end
-# January 20, every fourth year, following Presidential election
-def self.us_inauguration_day(year)
-  year % 4 == 1 ? 20 : nil
+
+  defp day_after_thanksgiving(year) do
+    # thanksgiving is the 4th thursday in november
+    date = %Date{year: year, month: 11, day: 1}
+    weekday = Date.day_of_week(date)
+
+    days_until_thursday = Integer.mod(4 - weekday, 7)
+
+    Date.add(date, days_until_thursday)
+    |> Date.add(21)
+    |> Date.add(1)
+  end
+
+  # January 20, every fourth year, following Presidential election
+  defp us_inauguration_day(year) do
+    if rem(year, 4) == 1 do
+      %Date{year: year, month: 1, day: 20}
+    else
+      nil
+    end
+  end
 end

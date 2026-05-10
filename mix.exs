@@ -21,7 +21,14 @@ defmodule HolidayEx.MixProject do
     [
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/OmniThinker/holiday_ex"},
-      files: ["lib", "priv", "mix.exs", "README.md", "LICENSE"]
+      files: [
+        "lib/holiday_ex.ex",
+        "lib/holiday_ex/utils.ex",
+        "priv/locale_modules",
+        "mix.exs",
+        "README.md",
+        "LICENSE"
+      ]
     ]
   end
 
@@ -34,7 +41,7 @@ defmodule HolidayEx.MixProject do
 
   defp deps do
     [
-      {:yaml_elixir, "~> 2.12", only: :dev, runtime: false},
+      {:yaml_elixir, "~> 2.12", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false}
     ]
   end

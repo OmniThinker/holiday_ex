@@ -28,11 +28,4 @@ defmodule HolidayEx.IE do
       true -> nil
     end
   end
-end# Ireland - Stephens Day is always the day after christmas day
-def self.ie_st_stephens_day(date)
-  case date.wday
-  when 6, 0 then date + 2
-  when 1 then date + 1
-  else date
-  end
 end

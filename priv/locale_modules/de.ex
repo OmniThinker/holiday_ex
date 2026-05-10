@@ -49,17 +49,19 @@ defmodule HolidayEx.DE do
       Date.add(easter_date, 39) == date -> "Christi Himmelfahrt"
       Date.add(easter_date, 50) == date -> "Pfingstmontag"
       Date.add(easter_date, 60) == date -> "Fronleichnam"
-      de_buss_und_bettag(year) -> "Buß- und Bettag"
+      date == de_buss_und_bettag(year) -> "Buß- und Bettag"
       true -> nil
     end
   end
-end# Germany: Wednesday before November 23
-def self.de_buss_und_bettag(year)
-  date = Date.civil(year,11,23)
-  if date.wday > 3
-    date -= (date.wday - 3)
-  else
-    date -= (date.wday + 4)
+
+  defp de_buss_und_bettag(year) do
+    date = %Date{year: year, month: 11, day: 23}
+    weekday = Date.day_of_week(date)
+
+    if weekday > 3 do
+      Date.add(date, -(weekday - 3))
+    else
+      Date.add(date, -(weekday + 4))
+    end
   end
-  date
 end
