@@ -40,18 +40,20 @@ end
  ```
 The library can then be used like so:
 ```elixir
-MyApp.Holiday.holiday?(~D[2026-01-01], :no)
+HolidayEx.holiday?(~D[2026-01-01], :no)
 => true
 
-MyApp.Holiday.holiday?(~D[2026-02-01], :no)
+HolidayEx.holiday?(~D[2026-02-01], :no)
 => false
 
-      MyApp.Holiday.holiday_name(~D[2026-12-24], :no)
-      "Julaften"
+HolidayEx.holiday_name(~D[2026-12-24], :no)
+=> "Julaften"
 
-      MyApp.Holiday.holiday_name(~D[2026-02-01], :no)
-      nil
+HolidayEx.holiday_name(~D[2026-02-01], :no)
+=> nil
 ```
+
+I recommend strongly that you only use this module one place and wrap the functions in that module.
 
   ## Dependency philosophy
   This library has zero dependencies, meaning as long as you understand the code you can be 100% sure that
