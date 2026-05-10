@@ -7,6 +7,10 @@ defmodule HolidayEx.JP do
   def holiday(%Date{month: 2, day: 11}) do
     "建国記念日"
   end
+  
+  def holiday(%Date{month: 2, day: 23}) do
+    "天皇誕生日"
+  end
 
   def holiday(%Date{month: 4, day: 29}) do
     "昭和の日"
@@ -30,10 +34,6 @@ defmodule HolidayEx.JP do
 
   def holiday(%Date{month: 11, day: 23}) do
     "勤労感謝の日"
-  end
-
-  def holiday(%Date{month: 12, day: 23}) do
-    "天皇誕生日"
   end
 
   def holiday(%Date{year: year} = date) do
