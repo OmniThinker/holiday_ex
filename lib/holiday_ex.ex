@@ -48,12 +48,6 @@ defmodule HolidayEx do
 
   @type locale :: unquote(Enum.reduce(Enum.reverse(@supported_locales), &{:|, [], [&1, &2]}))
 
-  @module_not_loaded_error_string ~S"""
-  You have not loaded this locale. 
-  See the documentation on __using__ this module, 
-  and see if your locale is supported
-  """
-
   @doc false
   defmacro __using__(opts) do
     user_locales = Keyword.get(opts, :locales)
@@ -98,14 +92,7 @@ defmodule HolidayEx do
   """
   @spec holiday?(Date.t(), locale()) :: boolean()
   def holiday?(%Date{} = date, locale) when is_atom(locale) do
-    locale_name = locale |> Atom.to_string() |> String.upcase()
-    module_name = Module.concat(HolidayEx, locale_name)
-
-    if Code.ensure_loaded?(module_name) do
-      not is_nil(module_name.holiday(date))
-    else
-      raise @module_not_loaded_error_string
-    end
+    not is_nil(holiday_name(date, locale))
   end
 
   @doc """
@@ -130,7 +117,11 @@ defmodule HolidayEx do
     if Code.ensure_loaded?(module_name) do
       module_name.holiday(date)
     else
-      raise @module_not_loaded_error_string
+      raise ~S"""
+      You have not loaded this locale. 
+      See the documentation on __using__ this module, 
+      and see if your locale is supported
+      """
     end
   end
 end
