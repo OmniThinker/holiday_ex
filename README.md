@@ -7,7 +7,7 @@
   messing around with genservers and applications we dynamically load locales at compile time, meaning we don't
   waste anyones memory, and the footprint stays as small as possible. 
 
-Uses easter calculation code from [[https://github.com/CoderDennis/holidays]] as well as yaml files with supported locales.
+Uses easter calculation code from [https://github.com/CoderDennis/holidays] as well as yaml files with supported locales.
 
 
 ## Installation
@@ -18,7 +18,7 @@ by adding `holiday_ex` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:holiday_ex, "~> 1.0.0"}
+    {:holiday_ex, "~> 1.0.1"}
   ]
 end
 ```
