@@ -7,7 +7,7 @@ defmodule HolidayEx.JP do
   def holiday(%Date{month: 2, day: 11}) do
     "建国記念日"
   end
-  
+
   def holiday(%Date{month: 2, day: 23}) do
     "天皇誕生日"
   end
@@ -135,8 +135,7 @@ defmodule HolidayEx.JP do
   defp compute_jp_date(year, month, base_day) do
     day =
       (base_day + 0.242194 * (year - 1980) - div(year - 1980, 4))
-      |> Float.floor()
-      |> trunc()
+      |> floor()
 
     Date.new!(year, month, day)
   end

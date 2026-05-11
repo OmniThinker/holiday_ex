@@ -48,17 +48,15 @@ defmodule HolidayEx.SE do
     end
   end
 
-  # Sweden: All Saint's Day (Saturday between Oct 31 and Nov 6)
   defp se_alla_helgons_dag(year) do
     date = %Date{year: year, month: 10, day: 31}
     weekday = Date.day_of_week(date)
-    Date.add(date, 6 - weekday)
+    Date.add(date, rem(6 - weekday + 7, 7))
   end
 
-  # Sweden: Mid-summer (Saturday between June 20–26)
   defp se_midsommardagen(year) do
     date = %Date{year: year, month: 6, day: 20}
     weekday = Date.day_of_week(date)
-    Date.add(date, 6 - weekday)
+    Date.add(date, rem(6 - weekday + 7, 7))
   end
 end

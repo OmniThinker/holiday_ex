@@ -74,14 +74,8 @@ defmodule HolidayEx.IS do
   end
 
   defp is_sumardagurinn_fyrsti(year) do
-    date = %Date{year: year, month: 4, day: 18}
+    date = %Date{year: year, month: 4, day: 19}
     weekday = Date.day_of_week(date)
-
-    if weekday < 4 do
-      Date.add(date, 4 - weekday)
-    else
-      date
-      Date.add(date, 11 - weekday)
-    end
+    Date.add(date, rem(4 - weekday + 7, 7))
   end
 end

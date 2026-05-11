@@ -57,11 +57,7 @@ defmodule HolidayEx.DE do
   defp de_buss_und_bettag(year) do
     date = %Date{year: year, month: 11, day: 23}
     weekday = Date.day_of_week(date)
-
-    if weekday > 3 do
-      Date.add(date, -(weekday - 3))
-    else
-      Date.add(date, -(weekday + 4))
-    end
+    days_back = rem(weekday - 3 + 6, 7) + 1
+    Date.add(date, -days_back)
   end
 end

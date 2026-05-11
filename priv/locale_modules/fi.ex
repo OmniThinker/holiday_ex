@@ -47,25 +47,19 @@ defmodule HolidayEx.FI do
   defp fi_juhannusaatto(year) do
     date = %Date{year: year, month: 6, day: 19}
     weekday = Date.day_of_week(date)
-    # if 19.6 is saturday
-    if weekday > 5 do
-      Date.add(date, 6)
-    else
-      Date.add(date, 5 - weekday)
-    end
+    Date.add(date, rem(5 - weekday + 7, 7))
   end
 
   # Finland: Mid-summer (Saturday between June 20–26)
   defp fi_juhannuspaiva(year) do
     date = %Date{year: year, month: 6, day: 20}
     weekday = Date.day_of_week(date)
-    Date.add(date, 6 - weekday)
+    Date.add(date, rem(6 - weekday + 7, 7))
   end
 
-  # Finland: All Saint's Day (Saturday between Oct 31 and Nov 6)
   defp fi_pyhainpaiva(year) do
     date = %Date{year: year, month: 10, day: 31}
     weekday = Date.day_of_week(date)
-    Date.add(date, 6 - weekday)
+    Date.add(date, rem(6 - weekday + 7, 7))
   end
 end

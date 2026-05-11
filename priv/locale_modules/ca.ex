@@ -80,14 +80,11 @@ defmodule HolidayEx.CA do
     weekday = Date.day_of_week(date)
 
     cond do
-      weekday > 1 ->
-        Date.add(date, -(weekday - 1))
-
-      weekday == 0 ->
-        Date.add(date, -6)
+      weekday == 1 ->
+        date
 
       true ->
-        date
+        Date.add(date, -(weekday - 1))
     end
   end
 end

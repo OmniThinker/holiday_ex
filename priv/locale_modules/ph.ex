@@ -57,8 +57,8 @@ defmodule HolidayEx.PH do
     end
   end
 
-  # last Monday of August
-  def ph_heroes_day(year) do
+  # last monday of august
+  defp ph_heroes_day(year) do
     date = %Date{year: year, month: 8, day: 31}
     weekday = Date.day_of_week(date)
 
